@@ -72,6 +72,22 @@ const response3 = await client
   );
 ```
 
+### Upload file
+
+```javascript
+    const formData = new FormData()
+    const file = fs.readFileSync(__dirname + '/' + filename + '.' + fileExt)
+    formData.append('file', file, filename + '.' + fileExt)
+    const requestBody = {
+      id: faker.number.int({min: 1, max: 1000}),
+    }
+    formData.append('id', requestBody.id.toString())
+    const { status, body } = await client
+      .post('/document')
+      .set(formData.getHeaders())
+      .send(formData.getBuffer())
+```
+
 ### Response Interface
 
 ```typescript
