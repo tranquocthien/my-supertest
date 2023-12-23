@@ -75,6 +75,8 @@ const response3 = await client
 ### Upload file
 
 ```javascript
+    const filename= 'test'
+    const fileExt = 'txt'
     const formData = new FormData()
     const file = fs.readFileSync(__dirname + '/' + filename + '.' + fileExt)
     formData.append('file', file, filename + '.' + fileExt)
