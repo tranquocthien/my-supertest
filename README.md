@@ -75,6 +75,8 @@ const response3 = await client
 ### Upload file
 
 ```javascript
+  import FormData from 'form-data'
+
     const filename= 'test'
     const fileExt = 'txt'
     const formData = new FormData()
