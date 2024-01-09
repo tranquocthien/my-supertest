@@ -7,16 +7,16 @@
 - Install package by yarn
 
 ```sh
-yarn add -D @suptertest-parent
+yarn add -D amaztest
 ```
 
 ## 2. Usage
 
-### Initialize Client
+### 2.1 Initialize Client
 
-```javascript
+```typescript
 import http from 'http';
-import { Client } from 'supertest-parent';
+import { Client } from 'amaztest';
 
 const requestListener = (req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -36,9 +36,9 @@ afterAll(async () => {
 });
 ```
 
-### Client Usage
+### 2.2 Client Usage
 
-```javascript
+```typescript
 const response1 = await client
   .get('/users?name=John&age=20')
   .query({ // <-- Set query string by object
@@ -68,7 +68,7 @@ const response3 = await client
     Buffer.from('Hello World'), // <-- Set request body, auto set 'Content-Length'
   )
   .send(
-    fs.createReadStream('file.txt'), // <-- Set request body by Stream.Readable
+    fs.createReadStream('file.txt'), // <-- Set request body by Stream.Readable instance, auto set 'Content-Length'
   );
 ```
 
@@ -92,7 +92,8 @@ const response3 = await client
       .send(formData.getBuffer())
 ```
 
-### Response Interface
+
+### 2.3 Response Interface
 
 ```typescript
 interface Response {
@@ -108,10 +109,10 @@ interface Response {
 
 ## 3. Advanced Usage
 
-### Extends the `Request` class
+### 3.1 Extends the `Request` class
 
-```javascript
-import { Client, Request, CreateRequestOptions } from '@quocthien/suppertest';
+```typescript
+import { Client, Request, CreateRequestOptions } from '@amaztest';
 
 class MyRequest extends Request {
   constructor(options: CreateRequestOptions) {
@@ -130,4 +131,12 @@ class MyClient extends Client {
 }
 
 const client = new MyClient(server);
+```
+
+### 3.2 Register hooks before request is sent
+  
+```typescript
+client.onBeforeSend(async (request) => {
+  // ...
+});
 ```

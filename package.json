@@ -1,6 +1,6 @@
 {
-  "name": "suptertest-parent",
-  "version": "1.0.0",
+  "name": "maztest",
+  "version": "1.0.2",
   "main": "dist/client.js",
   "types": "dist/client.d.ts",
   "license": "MIT",
@@ -26,7 +26,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tranquocthien/supertest-parent.git",
+    "url": "git+https://github.com/tranquocthien/amaztest.git",
     "directory": "/"
   },
   "volta": {

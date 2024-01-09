@@ -7,12 +7,16 @@ export interface Response {
   readonly headers: http.OutgoingHttpHeaders
   readonly charset: BufferEncoding
   readonly contentType: string
-  readonly body: string | object | Buffer
+  readonly body: any
 }
 
 export function parseBody(buffer: Buffer, contentType: string, charset: BufferEncoding = 'utf-8') {
   if (contentType.startsWith('application/json')) {
-    return JSON.parse(buffer.toString(charset))
+    try {
+      return JSON.parse(buffer.toString(charset))
+    } catch (error) {
+      return {}
+    }
   } else if (contentType.startsWith('text/')) {
     return buffer.toString(charset)
   } else {

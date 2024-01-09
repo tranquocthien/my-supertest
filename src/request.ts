@@ -1,6 +1,6 @@
 import http from 'http'
 import { Readable } from 'stream'
-import { kHooksBeforeSend, methods, methodsHasBody } from './const'
+import { kHooksBeforeSend, methods } from './const'
 import type { Client } from './client'
 import { parseBody, parseContentType, Response } from './response'
 
@@ -41,6 +41,30 @@ export class Request implements Promise<Response> {
     }
     return this
   }
+
+  contentType(type: string) {
+    // Remove old content-type
+    delete this.headers['content-type']
+    this.set('Content-Type', type)
+    return this
+  }
+  cookie(key: string, value: string) {
+    this.set('Cookie', `${key}=${value}`)
+    return this
+  }
+  auth(user: string, pass: string) {
+    // Remove old auth
+    delete this.headers.authorization
+    this.set('Authorization', `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`)
+    return this
+  }
+  auth2(token: string) {
+    // Remove old auth
+    delete this.headers.authorization
+    this.set('Authorization', `Bearer ${token}`)
+    return this
+  }
+
   // @ts-ignore
   query(key: string, value: any): this
   // @ts-ignore
@@ -83,7 +107,30 @@ export class Request implements Promise<Response> {
     for (const fn of client[kHooksBeforeSend]) {
       await fn(this)
     }
-    return new Promise<Response>((resolve, reject) => {
+    return new Promise<Response>(async (resolve, reject) => {
+      let data: Buffer
+      if (body instanceof Buffer) {
+        data = body
+      } else if (body instanceof Readable) {
+        data = await new Promise<Buffer>((resolve, reject) => {
+          const chunks: Buffer[] = []
+          body
+            .on('data', chunk => {
+              chunks.push(chunk)
+            })
+            .on('end', () => {
+              resolve(Buffer.concat(chunks))
+            })
+            .on('error', reject)
+        })
+      }
+
+      if (data) {
+        if (!this.headers['content-length']) {
+          this.set('Content-Length', String(data.byteLength))
+        }
+      }
+
       const request = http
         .request(
           {
@@ -97,12 +144,8 @@ export class Request implements Promise<Response> {
           }
         )
         .on('error', reject)
-      if (methodsHasBody.includes(this.method as any) && body) {
-        if (body instanceof Buffer) {
-          request.end(body)
-        } else if (body instanceof Readable) {
-          body.pipe(request)
-        } else request.end()
+      if (data) {
+        request.end(data)
       } else {
         request.end()
       }
